@@ -6,10 +6,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Create Android APK
-        uses: firebelley/pwa-to-apk-action@v1.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          web_url: "https://medhoms2028.netlify.app"
-          manifest_url: "https://medhoms2028.netlify.app/manifest.json"
+          node-version: '16'
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Build APK
+        run: |
+          yes | bubblewrap init --manifest=https://medhoms2028.netlify.app/manifest.json
+          bubblewrap build
