@@ -1,0 +1,16 @@
+name: Build Android APK
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Android PWA
+        uses: jvitor83/pwa-to-android@v1.1
+        with:
+          # رابط موقعك على Netlify
+          web_url: https://medhoms2028.netlify.app
+          manifest_url: https://medhoms2028.netlify.app/manifest.json
