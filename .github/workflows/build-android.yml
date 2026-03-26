@@ -6,28 +6,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # التحديث لـ v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # التحديث لـ v4
         with:
-          node-version: '16'
+          node-version: '20' # تحديث إصدار نود لضمان التوافق
 
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
       - name: Build TWA App
         run: |
-          # استخدام ملف المانفست الجاهز لمنع الأسئلة (Silent Mode)
+          # تأكد من وجود ملف twa-manifest.json
           bubblewrap init --manifest=https://medhoms2028.netlify.app/manifest.json --directory=./ --metaData=./twa-manifest.json
-          # البناء وتخطي أي تحذيرات
           bubblewrap build --accept_toast_navigation_parameters
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4 # التحديث للنسخة v4 (هذا هو الحل للخطأ!)
         with:
           name: Medical-App-Release
-          # هذا المسار حيث يضع Bubblewrap الملفات الناتجة عادةً
           path: |
             *.apk
             *.aab
