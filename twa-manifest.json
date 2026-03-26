@@ -1,8 +1,8 @@
 {
   "packageId": "com.medhoms.app",
   "host": "medhoms2028.netlify.app",
-  "name": "منصة الطب",
-  "launcherName": "منصة الطب",
+  "name": "MedHoms",
+  "launcherName": "MedHoms",
   "display": "standalone",
   "themeColor": "#3c4e65",
   "navigationColor": "#3c4e65",
