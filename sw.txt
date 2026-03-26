@@ -1,0 +1,163 @@
+// sw.js - Service Worker للمنصة التعليمية
+// الإصدار: 1.0.0
+// استراتيجية: Network First مع Fallback إلى Cache
+
+const CACHE_NAME = 'medical-platform-v1';
+
+// قائمة بجميع الملفات التي سيتم تخزينها مؤقتاً
+const urlsToCache = [
+  './',
+  './index.html',
+  './main.js',
+  './style.css',
+  './manifest.json',
+  
+  // أيقونات PWA (جميع الأحجام التي تم توليدها)
+  './icons/icon-72x72.png',
+  './icons/icon-96x96.png',
+  './icons/icon-128x128.png',
+  './icons/icon-144x144.png',
+  './icons/icon-152x152.png',
+  './icons/icon-192x192.png',
+  './icons/icon-256x256.png',
+  './icons/icon-384x384.png',
+  './icons/icon-512x512.png',
+
+  // السنة الثالثة - الفصل الثاني
+  './3/ses2/index.html',
+  './3/ses2/script.js',
+  './3/ses2/data-js/courseQuestionsImmunology.js',
+  './3/ses2/data-js/courseQuestionsMicrobiology2.js',
+  './3/ses2/data-js/courseQuestionsPathology1.js',
+  './3/ses2/data-js/courseQuestionsPublicHealth.js',
+  './3/ses2/data-js/courseQuestionsEvidenceBasedMedicine.js',
+  './3/ses2/data-js/courseQuestionsPharmacology.js',
+  './3/ses2/data-js/courseQuestionsSurgicalSkills.js',
+
+  // السنة الرابعة - الفصل الأول
+  './4/ses1/index.html',
+  './4/ses1/script.js',
+  './4/ses1/data-js/courseQuestionsPath.js',
+  './4/ses1/data-js/courseQuestionsinfect.js',
+  './4/ses1/data-js/courseQuestionsSurgeryDoctor1.js',
+  './4/ses1/data-js/courseQuestionsSurgeryDoctor2.js',
+  './4/ses1/data-js/courseQuestionsSurgeryDoctor3.js',
+  './4/ses1/data-js/courseQuestionsendocrinology.js',
+  './4/ses1/data-js/courseQuestionsgastroenterology.js',
+  './4/ses1/data-js/courseQuestionsENT.js',
+  './4/ses1/data-js/courseQuestionsOncologyDoctor1.js',
+  './4/ses1/data-js/courseQuestionsOncologyDoctor2.js',
+
+  // السنة الرابعة - الفصل الثاني
+  './4/ses2/index.html',
+  './4/ses2/script.js',
+  './4/ses2/data-js/courseQuestionsChest.js',
+  './4/ses2/data-js/courseQuestionsCardiology.js',
+  './4/ses2/data-js/courseQuestionsDermatology.js',
+  './4/ses2/data-js/courseQuestionsObstetrics.js',
+  './4/ses2/data-js/courseQuestionsCardiothoracicSurgery.js',
+  './4/ses2/data-js/courseQuestionsRadiology1.js',
+  './4/ses2/data-js/courseQuestionsEmergencyAnesthesia.js',
+];
+
+// دالة مساعدة لتوليد مسارات ملفات الدورات لكل فصل
+function generateCourseUrls(basePath, subjectKey, years) {
+  return years.map(year => `${basePath}/courses/course${year}${subjectKey}.js`);
+}
+
+// إضافة ملفات الدورات لكل فصل
+// السنة الثالثة - الفصل الثاني
+urlsToCache.push(...generateCourseUrls('./3/ses2', 'Immunology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./3/ses2', 'Microbiology2', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./3/ses2', 'Pathology1', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./3/ses2', 'PublicHealth', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./3/ses2', 'EvidenceBasedMedicine', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./3/ses2', 'Pharmacology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./3/ses2', 'SurgicalSkills', [2020,2021,2022,2023,2024,2025]));
+
+// السنة الرابعة - الفصل الأول
+urlsToCache.push(...generateCourseUrls('./4/ses1', 'Pathology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses1', 'Infectious', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses1', 'Surgery', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses1', 'Endocrinology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses1', 'Gastroenterology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses1', 'Oncology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses1', 'ENT', [2020,2021,2022,2023,2024,2025]));
+
+// السنة الرابعة - الفصل الثاني
+urlsToCache.push(...generateCourseUrls('./4/ses2', 'Chest', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses2', 'Cardiology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses2', 'Dermatology', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses2', 'Obstetrics', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses2', 'CardiothoracicSurgery', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses2', 'Radiology1', [2020,2021,2022,2023,2024,2025]));
+urlsToCache.push(...generateCourseUrls('./4/ses2', 'EmergencyAnesthesia', [2020,2021,2022,2023,2024,2025]));
+
+// تثبيت الـ Service Worker وتخزين الملفات
+self.addEventListener('install', event => {
+  console.log('[SW] Installing...');
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('[SW] Caching app shell');
+      return cache.addAll(urlsToCache);
+    }).catch(err => {
+      console.error('[SW] Failed to cache:', err);
+    })
+  );
+  // تفعيل فورياً
+  self.skipWaiting();
+});
+
+// تنشيط الـ Service Worker وتنظيف الكاش القديم
+self.addEventListener('activate', event => {
+  console.log('[SW] Activating...');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', cache);
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// استراتيجية Network First (الشبكة أولاً، ثم الكاش)
+self.addEventListener('fetch', event => {
+  const requestUrl = new URL(event.request.url);
+  
+  // تخطي طلبات analytics أو extensions
+  if (requestUrl.origin !== location.origin) return;
+  
+  // لتجنب التخزين المؤقت لطلبات POST
+  if (event.request.method !== 'GET') return;
+  
+  event.respondWith(
+    fetch(event.request)
+      .then(networkResponse => {
+        // إذا نجحت الشبكة، نخزن النسخة الجديدة في الكاش
+        const responseClone = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseClone);
+        });
+        return networkResponse;
+      })
+      .catch(() => {
+        // عند فشل الشبكة، نبحث في الكاش
+        return caches.match(event.request).then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          // إذا لم يكن في الكاش، نعيد صفحة مخصصة
+          return new Response('لا يوجد اتصال بالإنترنت والمحتوى غير متاح حالياً', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: new Headers({ 'Content-Type': 'text/plain' })
+          });
+        });
+      })
+  );
+});
