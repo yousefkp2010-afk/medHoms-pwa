@@ -5,7 +5,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -17,5 +18,17 @@ jobs:
 
       - name: Build TWA App
         run: |
-          yes | bubblewrap init --manifest=https://medhoms2028.netlify.app/manifest.json
+          # استخدام ملف المانفست الجاهز لمنع الأسئلة (Silent Mode)
+          bubblewrap init --manifest=https://medhoms2028.netlify.app/manifest.json --directory=./ --metaData=./twa-manifest.json
+          # البناء وتخطي أي تحذيرات
           bubblewrap build --accept_toast_navigation_parameters
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Medical-App-Release
+          # هذا المسار حيث يضع Bubblewrap الملفات الناتجة عادةً
+          path: |
+            *.apk
+            *.aab
+            assetlinks.json
