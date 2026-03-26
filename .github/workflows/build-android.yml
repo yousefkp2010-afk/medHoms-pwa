@@ -6,11 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Build Android PWA
-        uses: jvitor83/pwa-to-android@v1.1
+      - name: Build Android App
+        uses: Bubblewrap/bubblewrap-action@v1
         with:
-          # رابط موقعك على Netlify
-          web_url: https://medhoms2028.netlify.app
-          manifest_url: https://medhoms2028.netlify.app/manifest.json
+          # رابط موقعك ومانفستك على نتليفاي
+          url: https://medhoms2028.netlify.app
+          manifest: https://medhoms2028.netlify.app/manifest.json
