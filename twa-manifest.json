@@ -1,0 +1,23 @@
+{
+  "packageId": "com.medhoms.app",
+  "host": "medhoms2028.netlify.app",
+  "name": "منصة الطب",
+  "launcherName": "منصة الطب",
+  "display": "standalone",
+  "themeColor": "#3c4e65",
+  "navigationColor": "#3c4e65",
+  "backgroundColor": "#3c4e65",
+  "startUrl": "/",
+  "iconUrl": "https://medhoms2028.netlify.app/icons/icon-512x512.png",
+  "maskableIconUrl": "https://medhoms2028.netlify.app/icons/icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [],
+  "features": {
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaCode": "1"
+}
